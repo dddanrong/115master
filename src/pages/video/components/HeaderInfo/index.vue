@@ -70,17 +70,13 @@ import { formatFileSize } from '../../../../utils/format'
 
 // 处理编辑模式下的按键事件  
 const handleKeyDown = (event: KeyboardEvent) => {  
-  // 阻止播放器热键在编辑模式下触发  
-  const playerHotKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'A', 'd', 'D', 'w', 'W', 's', 'S']  
-    
-  if (playerHotKeys.includes(event.key)) {  
-    event.stopPropagation()  
-  }  
+  // 阻止所有按键事件冒泡到播放器  
+  event.stopPropagation()  
     
   // 特别处理回车键：阻止换行，直接确认保存  
   if (event.key === 'Enter') {  
-    event.preventDefault() // 阻止默认的换行行为  
-    handleSave() // 直接调用保存函数  
+    event.preventDefault()  
+    handleSave()  
   }  
 }
 
