@@ -11,6 +11,15 @@
     >
       <!-- 进度条内容器 -->
       <div :class="[styles.progressBar.track]">
+      <!-- 时间书签标记 -->  
+<div  
+  v-for="marker in timeMarkers"  
+  :key="marker.time"  
+  :class="styles.timeMarker.base"  
+  :style="{ left: `${marker.position}%` }"  
+  :title="`${marker.label} - ${formatTime(marker.time)}`"  
+/>
+
         <!-- 原始播放进度（拖拽时保持显示） -->
         <div
           :class="styles.thumb.current"
@@ -73,12 +82,19 @@
 
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
-import { computed, onUnmounted, shallowRef } from 'vue'
+import { computed, onUnmounted, shallowRef, watch, nextTick } from 'vue'
 import { usePlayerContext } from '../../hooks/usePlayerProvide'
 import Thumbnail from '../Thumbnail/index.vue'
 
 /** 样式抽象 */
 const styles = {
+  timeMarker: {  
+  base: [  
+    'absolute top-0 bottom-0 w-1.5',  
+    'bg-yellow-400 z-20 transform -translate-x-1/2',  
+    'pointer-events-none opacity-80' 
+  ]  
+},
   progressBar: {
     root: 'relative',
     wrapper: 'py-2 cursor-pointer relative',
@@ -107,6 +123,66 @@ const styles = {
 
 const { progressBar, playerCore: player, controls } = usePlayerContext()
 
+// 时间标记数据  
+const timeMarkers = shallowRef([])  
+  
+// 解析网页标题中的时间点   
+function parseTimeMarkersFromTitle() {  
+  const title = document.title  
+  const isFC2 = title.includes('FC2')  
+    
+  // 更新正则表达式支持 *h*m*s 格式，其中h和s可选  
+  const timeRegex = /(\d+h)?(\d+m)(初|末)?(\d+s)?/g  
+  const markers = []  
+  let match  
+    
+  while ((match = timeRegex.exec(title)) !== null) {  
+    const hours = match[1] ? parseInt(match[1]) : 0  
+    const minutes = match[2] ? parseInt(match[2]) : 0  
+    const seconds = match[4] ? parseInt(match[4]) : 0  
+    const suffix = match[3] // 初、末  
+      
+    let totalSeconds = hours * 3600 + minutes * 60 + seconds  
+      
+    // FC2特殊处理  
+    if (isFC2 && suffix) {  
+      if (suffix === '初') {  
+        totalSeconds = hours * 3600 + minutes * 60 + 0 // *h*m0s  
+      } else if (suffix === '末') {  
+        totalSeconds = hours * 3600 + minutes * 60 + 40 // *h*m40s  
+      }  
+    } else if (isFC2 && !suffix && !match[4]) {  
+      // FC2且没有后缀和秒数，默认为20秒  
+      totalSeconds = hours * 3600 + minutes * 60 + 20 // *h*m20s  
+    }  
+      
+    if (totalSeconds > 0 && duration.value > 0) {  
+      const position = (totalSeconds / duration.value) * 100  
+      if (position <= 100) {  
+        markers.push({  
+          time: totalSeconds,  
+          position: position,  
+          label: match[0]  
+        })  
+      }  
+    }  
+  }  
+    
+  timeMarkers.value = markers  
+}
+  
+// 格式化时间显示  
+function formatTime(seconds) {  
+  const hours = Math.floor(seconds / 3600)  
+  const minutes = Math.floor((seconds % 3600) / 60)  
+  const secs = Math.floor(seconds % 60)  
+    
+  if (hours > 0) {  
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`  
+  }  
+  return `${minutes}:${secs.toString().padStart(2, '0')}`  
+}
+
 const progressValue = computed(() => {
   return (
     ((player.value?.currentTime ?? 0) / (player.value?.duration ?? 1)) * 100
@@ -114,6 +190,19 @@ const progressValue = computed(() => {
 })
 
 const duration = computed(() => player.value?.duration ?? 0)
+// 在第116行duration计算属性之后添加  
+watch(  
+  [() => player.value?.canplay, () => duration.value, () => controls.visible.value],  
+  ([canplay, dur, visible]) => {  
+    // 当播放器准备就绪、有时长、控制栏可见且时间标记为空时，解析时间标记  
+    if (canplay && dur > 0 && visible && timeMarkers.value.length === 0) {  
+      nextTick(() => {  
+        parseTimeMarkersFromTitle()  
+      })  
+    }  
+  },  
+  { immediate: true }  
+)
 /** 进度条容器 */
 const progressBarWrapperRef = shallowRef<HTMLElement | null>(null)
 /** 进度条宽度 - 使用 useElementSize 替代 */
