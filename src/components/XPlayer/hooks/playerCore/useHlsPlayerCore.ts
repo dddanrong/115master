@@ -54,29 +54,41 @@ export function useHlsPlayerCore(ctx: PlayerContext) {
         ...config,
       })
     },
-    load: (url: string) => {
-      const videoElement = videoNative.getRenderElement() as HTMLVideoElement
-      const hls = getHlsRef()
-      hls.loadSource(url)
-      hls.attachMedia(videoElement)
-      videoElement.muted = videoNative.muted.value
-      videoElement.playbackRate = videoNative.playbackRate.value
-      videoElement.volume = videoNative.volume.value / 100
-      return new Promise<void>((resolve, reject) => {
-        useEventListener(videoElement, 'loadedmetadata', () => {
-          videoNative.duration.value = videoElement.duration
-          resolve()
-
-          if (videoNative.autoPlay.value) {
-            videoNative.play()
-          }
-        })
-        useEventListener(videoElement, 'error', (_event) => {
-          videoNative.loadError.value = new Error('NotSupportedError')
-          reject(videoNative.loadError.value)
-        })
-      })
-    },
+load: (url: string, lastTime?: number) => {  
+  const videoElement = videoNative.getRenderElement() as HTMLVideoElement  
+  const hls = getHlsRef()  
+  hls.loadSource(url)  
+  hls.attachMedia(videoElement)  
+  videoElement.muted = videoNative.muted.value  
+  videoElement.playbackRate = videoNative.playbackRate.value  
+  videoElement.volume = videoNative.volume.value / 100  
+    
+  // 设置播放时间  
+  if (lastTime && lastTime > 0) {  
+    videoElement.currentTime = lastTime  
+  }  
+    
+  return new Promise<void>((resolve, reject) => {  
+    useEventListener(videoElement, 'loadedmetadata', () => {  
+      videoNative.duration.value = videoElement.duration  
+        
+      // 在元数据加载后再次设置时间，确保生效  
+      if (lastTime && lastTime > 0) {  
+        videoElement.currentTime = lastTime  
+      }  
+        
+      resolve()  
+  
+      if (videoNative.autoPlay.value) {  
+        videoNative.play()  
+      }  
+    })  
+    useEventListener(videoElement, 'error', (_event) => {  
+      videoNative.loadError.value = new Error('NotSupportedError')  
+      reject(videoNative.loadError.value)  
+    })  
+  })  
+},
     destroy: () => {
       if (hlsRef.value) {
         hlsRef.value.destroy()

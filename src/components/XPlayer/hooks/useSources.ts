@@ -158,22 +158,28 @@ export function useSources(ctx: PlayerContext) {
   /** 使用防抖的切换播放器核心方法 */
   const switchPlayerCore = useDebounceFn(switchPlayerCoreImpl, 300)
 
-  watch(
-    list,
-    async () => {
-      isInterrupt.value = false
-      if (list.value.length === 0) {
-        await ctx.playerCore.value?.destroy()
-        return
-      }
-      await initializeVideo(
-        list.value[0],
-        undefined,
-        toValue(ctx.rootProps.lastTime),
-      )
-    },
-    { immediate: true, deep: true },
-  )
+watch(  
+  list,  
+  async () => {  
+    isInterrupt.value = false  
+    if (list.value.length === 0) {  
+      await ctx.playerCore.value?.destroy()  
+      return  
+    }  
+      
+    // 选择最低画质源而不是第一个源  
+    const lowestQualitySource = list.value.reduce((lowest, current) =>   
+      current.quality < lowest.quality ? current : lowest  
+    )  
+      
+    await initializeVideo(  
+      lowestQualitySource,  
+      undefined,  
+      toValue(ctx.rootProps.lastTime),  
+    )  
+  },  
+  { immediate: true, deep: true },  
+)
 
   return {
     list,
