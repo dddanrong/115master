@@ -108,6 +108,11 @@ const KEYS = {
   'L': 'L',
   'r': 'r',
   'R': 'R',
+  'enter': 'Enter',  
+  'z': 'z',  
+  'Z': 'Z',   
+  'x': 'x',  
+  'X': 'X',
 }
 
 const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
@@ -147,46 +152,77 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 ← a 快退
    */
   fastBackward: {
-    keys: [KEYS.arrowLeft, KEYS.a, KEYS.A],
-    name: '快退',
+    keys: [KEYS.a, KEYS.A],
+    name: '快退5s',
     allowRepeat: true,
     keydown: (ctx) => {
       ctx.playerCore.value?.skip(-5)
       ctx.hud?.showFastJumpHud(-1)
     },
   },
-
-  /**
-   * 按下 → d 快进
-   */
-  fastForward: {
-    keys: [KEYS.arrowRight, KEYS.d, KEYS.D],
-    name: '快进',
+   /**
+   * 按下 ←  快退
+   */ 
+  fastBackwardMore: {
+    keys: [KEYS.arrowLeft],
+    name: '快退25s',
     allowRepeat: true,
-    keydown: async (ctx, event) => {
-      if (event.repeat) {
-        if (!ctx.playbackRate?.fastForward.value) {
-          ctx.playbackRate?.startLongPressFastForward()
-        }
-        ctx.hud?.showLongPressFastForward()
-        return
-      }
-      ctx.playerCore.value?.skip(5)
-      ctx.hud?.showFastJumpHud(1)
-    },
-    keyup: async (ctx) => {
-      if (ctx.playbackRate?.fastForward.value) {
-        ctx.playbackRate?.stopLongPressFastForward()
-        ctx.hud?.clear()
-      }
+    keydown: (ctx) => {
+      ctx.playerCore.value?.skip(-25)
+      ctx.hud?.showFastJumpHud(-1)
     },
   },
-
+   /**
+   * 按下 Ctrl + ←  快退
+   */ 
+  fastBackwardLong: {  
+  keys: ['Control+ArrowLeft'],  
+  name: '快退110s',  
+  keydown: (ctx) => {  
+    ctx.playerCore.value?.skip(-110)  
+    ctx.hud?.showFastJumpHud(-1)  
+  },  
+},  
   /**
-   * 按下 ↑ w 播放速度增大
+   * 按下 d 快进
+   */
+  fastForward: {
+    keys: [KEYS.d, KEYS.D],
+    name: '快进5s',
+    allowRepeat: true,
+  keydown: (ctx) => {  
+    ctx.playerCore.value?.skip(5)  
+    ctx.hud?.showFastJumpHud(1)  
+  },  
+  },
+  /**
+   * 按下 →  快进
+   */
+  fastForwardMore: {
+    keys: [KEYS.arrowRight],
+    name: '快进30s',
+    allowRepeat: true,
+  keydown: (ctx) => {  
+    ctx.playerCore.value?.skip(30)  
+    ctx.hud?.showFastJumpHud(1)  
+  },  
+  },
+  /**
+   * 按下 Ctrl + →  快进
+   */
+fastForwardLong: {  
+  keys: ['Control+ArrowRight'],   
+  name: '快进120s',  
+  keydown: (ctx) => {  
+    ctx.playerCore.value?.skip(120)  
+    ctx.hud?.showFastJumpHud(1)  
+  },  
+},
+  /**
+   * 按下 w 播放速度增大
    */
   playbackRateUp: {
-    keys: [KEYS.arrowUp, KEYS.w, KEYS.W],
+    keys: [KEYS.w, KEYS.W],
     name: '播放速度增大',
     allowRepeat: true,
     keydown: async (ctx) => {
@@ -196,10 +232,10 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
   },
 
   /**
-   * 按下 ↓ s 播放速度减小
+   * 按下 s 播放速度减小
    */
   playbackRateDown: {
-    keys: [KEYS.arrowDown, KEYS.s, KEYS.S],
+    keys: [KEYS.s, KEYS.S],
     name: '播放速度减小',
     allowRepeat: true,
     keydown: (ctx, event) => {
@@ -218,7 +254,7 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 = 音量增大
    */
   volumeUp: {
-    keys: [KEYS['=']],
+    keys: [KEYS.arrowUp, KEYS['=']],
     name: '音量增大',
     allowRepeat: true,
     keydown: (ctx) => {
@@ -231,7 +267,7 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 - 音量减小
    */
   volumeDown: {
-    keys: [KEYS['-']],
+    keys: [KEYS.arrowDown, KEYS['-']],
     name: '音量减小',
     allowRepeat: true,
     keydown: (ctx) => {
@@ -286,7 +322,7 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 f 切换全屏
    */
   toggleFullscreen: {
-    keys: [KEYS.f, KEYS.F],
+    keys: [KEYS.enter, KEYS.f, KEYS.F],
     name: '切换全屏',
     keydown: (ctx) => {
       ctx.fullscreen?.toggleFullscreen()
@@ -294,10 +330,10 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
   },
 
   /**
-   * 按下 b 切换播放列表
+   * 按下 l 切换播放列表
    */
   toggleShowSider: {
-    keys: [KEYS.b, KEYS.B],
+    keys: [KEYS.l, KEYS.L],
     name: '切换播放列表',
     keydown: (ctx) => {
       ctx.fullscreen?.toggleShowSider()
@@ -319,7 +355,7 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 [ 向左旋转
    */
   rotateLeft: {
-    keys: [KEYS['['], KEYS.l, KEYS.L],
+    keys: [KEYS['['], KEYS.z, KEYS.Z],
     name: '向左旋转',
     keydown: (ctx) => {
       ctx.transform?.left()
@@ -330,7 +366,7 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
    * 按下 ] 向右旋转
    */
   rotateRight: {
-    keys: [KEYS[']'], KEYS.r, KEYS.R],
+    keys: [KEYS[']'], KEYS.x, KEYS.X],
     name: '向右旋转',
     keydown: (ctx) => {
       ctx.transform?.right()
