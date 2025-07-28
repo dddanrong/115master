@@ -159,6 +159,22 @@ export function useControls(ctx: PlayerContext) {
   useEventListener(ctx.refs.rootRef, 'mousemove', handleRootMouseMove)
   useEventListener(ctx.refs.rootRef, 'mouseleave', handleRootMouseLeave)
 
+  // 在 useControls 函数中添加播放状态监听  
+watch(  
+  () => ctx.playerCore.value?.paused,  
+  (isPaused) => {  
+    if (isPaused) {  
+      // 暂停时禁用自动隐藏并显示控制栏  
+      addDisabledAutoHide()  
+      show()  
+    } else {  
+      // 播放时恢复自动隐藏  
+      removeDisabledAutoHide()  
+      startAutoHideTimer()  
+    }  
+  }  
+)
+
   onUnmounted(() => {
     stopAutoHideTimer()
   })
