@@ -1,14 +1,25 @@
-import type { PlayerContext } from './usePlayerProvide'
-import { shallowRef, watch } from 'vue'
-
-/**
- * 进度条
- */
-export function useProgressBar(_ctx: PlayerContext) {
-  /** 拖拽 */
-  const isDragging = shallowRef(false)
-  /** 长按拖拽 */
-  const isLongPressDragging = shallowRef(false)
+import type { PlayerContext } from './usePlayerProvide'  
+import { shallowRef, watch, type Ref } from 'vue'  
+  
+// 添加时间标记类型定义  
+interface TimeMarker {  
+  time: number  
+  position: number  
+  label: string  
+  text: string  
+  width: number  
+}  
+  
+/**  
+ * 进度条  
+ */  
+export function useProgressBar(_ctx: PlayerContext) {  
+  /** 拖拽 */  
+  const isDragging = shallowRef(false)  
+  /** 长按拖拽 */  
+  const isLongPressDragging = shallowRef(false)  
+  /** 时间标记数据 */  
+  const timeMarkers = shallowRef<TimeMarker[]>([])  
 
   /** 长按计时器 */
   let longPressTimer: ReturnType<typeof setTimeout> | null = null
@@ -48,6 +59,7 @@ export function useProgressBar(_ctx: PlayerContext) {
   return {
     isDragging,
     isLongPressDragging,
-    waitDragEnd,
+    waitDragEnd,  
+    timeMarkers, // 添加这一行  
   }
 }

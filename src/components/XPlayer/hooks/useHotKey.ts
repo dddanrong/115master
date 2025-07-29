@@ -113,6 +113,9 @@ const KEYS = {
   'Z': 'Z',   
   'x': 'x',  
   'X': 'X',
+  ',': ',',
+  '.': '.',
+
 }
 
 const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
@@ -405,6 +408,42 @@ fastForwardLong: {
       ctx.transform?.toggleFlipY()
     },
   },
+  // 在 HOT_KEYS_CONFIG 对象中添加  
+jumpToPrevMarker: {  
+  keys: [','],  
+  name: '跳转到上一个时间标记',  
+  keydown: (ctx) => {  
+    const currentTime = ctx.playerCore.value?.currentTime ?? 0  
+    const markers = ctx.progressBar?.timeMarkers?.value ?? []  
+      
+    // 找到当前时间左侧的第一个标记  
+    const prevMarker = markers  
+      .filter(marker => marker.time < currentTime)  
+      .sort((a, b) => b.time - a.time)[0]  
+      
+    if (prevMarker) {  
+      ctx.playerCore.value?.seek(prevMarker.time)  
+    }  
+  },  
+},  
+  
+jumpToNextMarker: {  
+  keys: ['.'],  
+  name: '跳转到下一个时间标记',  
+  keydown: (ctx) => {  
+    const currentTime = ctx.playerCore.value?.currentTime ?? 0  
+    const markers = ctx.progressBar?.timeMarkers?.value ?? []  
+      
+    // 找到当前时间右侧的第一个标记  
+    const nextMarker = markers  
+      .filter(marker => marker.time > currentTime)  
+      .sort((a, b) => a.time - b.time)[0]  
+      
+    if (nextMarker) {  
+      ctx.playerCore.value?.seek(nextMarker.time)  
+    }  
+  },  
+},
 }
 
 /**

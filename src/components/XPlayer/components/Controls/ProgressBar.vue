@@ -398,4 +398,10 @@ onUnmounted(() => {
   document.removeEventListener('mousemove', handleGlobalMouseMove)
   document.removeEventListener('mouseup', handleGlobalMouseUp)
 })
+
+// 暴露 timeMarkers 给上下文  
+if (progressBar) {  
+  progressBar.timeMarkers = timeMarkers  
+}
+
 </script>
