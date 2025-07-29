@@ -115,7 +115,8 @@ const KEYS = {
   'X': 'X',
   ',': ',',
   '.': '.',
-
+'e': 'e',  
+'E': 'E',
 }
 
 const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
@@ -151,6 +152,17 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
     },
   },
 
+  /**  
+ * 按下 e 进入文件标题编辑模式  
+ */  
+editFileName: {  
+  keys: [KEYS.e, KEYS.E],  
+  name: '编辑文件名',  
+  keydown: (ctx) => {  
+    // 触发文件名编辑事件  
+    ctx.rootEmit('edit-filename')  
+  },  
+},
   /**
    * 按下 ← a 快退
    */

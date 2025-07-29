@@ -90,9 +90,13 @@ const autoResize = () => {
 }  
   
 // 修改 startEdit 函数  
-const startEdit = () => {    
-  if (!props.fileInfo.state?.file_id) return    
-  isEditing.value = true    
+const startEdit = () => {  
+    
+  if (!props.fileInfo.state?.file_id) {  
+    return  
+  }  
+    
+  isEditing.value = true   
     
   const fullFileName = props.fileInfo.state?.file_name || ''  
   // 分离文件名和扩展名  
@@ -108,24 +112,6 @@ const startEdit = () => {
   })    
 }
 
-const props = defineProps<{  
-  /** 文件信息 */  
-  fileInfo: ReturnType<typeof useDataFileInfo>  
-  /** 播放列表 */  
-  playlist: ReturnType<typeof useDataPlaylist>  
-}>()  
-  
-// 编辑状态  
-const isEditing = ref(false)  
-const editingName = ref('')  
-const nameInput = ref<HTMLInputElement>()  
-  
-// 取消编辑  
-const cancelEdit = () => {  
-  isEditing.value = false  
-  editingName.value = ''  
-}  
-  
 // 保存文件名  
 const handleSave = async () => {    
   const trimmedName = editingName.value.trim()    
@@ -179,6 +165,26 @@ const handleSave = async () => {
     
   cancelEdit()  
 }  
+
+const props = defineProps<{  
+  /** 文件信息 */  
+  fileInfo: ReturnType<typeof useDataFileInfo>  
+  /** 播放列表 */  
+  playlist: ReturnType<typeof useDataPlaylist>  
+}>()  
+  
+// 编辑状态  
+const isEditing = ref(false)  
+const editingName = ref('')  
+const nameInput = ref<HTMLInputElement>()  
+  
+// 取消编辑  
+const cancelEdit = () => {  
+  isEditing.value = false  
+  editingName.value = ''  
+}  
+  
+
   
 const styles = {  
   /** 容器样式 */  
@@ -212,4 +218,9 @@ const path = computed(() => {
 function handleOpenFolder(id: string) {  
   window.open(`https://115.com/?cid=${id}&offset=0&mode=wangpan`, '_blank')  
 }  
+
+// 暴露方法给父组件  
+defineExpose({  
+  startEdit  
+})
 </script>

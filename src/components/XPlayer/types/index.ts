@@ -157,6 +157,8 @@ export interface XPlayerProps {
 }
 
 export interface XPlayerEmit {
+  /** 编辑文件名 */  
+'edit-filename': []
   /** 播放列表 */
   'update:showPlaylist': [boolean]
   /** 音量 */

@@ -21,36 +21,38 @@
             ]"
           >
             <!-- 视频播放器 -->
-            <XPlayer
-              ref="xplayerRef"
-              v-model:show-playlist="preferences.showPlaylist"
-              v-model:volume="preferences.volume"
-              v-model:muted="preferences.muted"
-              v-model:playback-rate="preferences.playbackRate"
-              v-model:auto-load-thumbnails="preferences.autoLoadThumbnails"
-              v-model:disabled-h-d-r="preferences.disabledHDR"
-              v-model:thumbnails-sampling-interval="preferences.thumbnailsSamplingInterval"
-              v-model:auto-play="preferences.autoPlay"
-              :class="[styles.player.video]"
-              :style="{
-                aspectRatio,
-              }"
-              :sources="DataVideoSources.list"
-              :subtitles="DataSubtitles.state"
-              :last-time="DataHistory.lastTime.value"
-              :subtitles-loading="DataSubtitles.isLoading"
-              :subtitles-ready="DataSubtitles.isReady"
-              :on-thumbnail-request="DataThumbnails.onThumbnailRequest"
-              :on-subtitle-change="handleSubtitleChange"
-              :on-timeupdate="handleTimeupdate"
-              :on-seeking="DataHistory.handleSeek"
-              :on-seeked="DataHistory.handleSeek"
-              :on-canplay="handleStartAutoBuffer"  
+<XPlayer  
+  ref="xplayerRef"  
+  v-model:show-playlist="preferences.showPlaylist"  
+  v-model:volume="preferences.volume"  
+  v-model:muted="preferences.muted"  
+  v-model:playback-rate="preferences.playbackRate"  
+  v-model:auto-load-thumbnails="preferences.autoLoadThumbnails"  
+  v-model:disabled-h-d-r="preferences.disabledHDR"  
+  v-model:thumbnails-sampling-interval="preferences.thumbnailsSamplingInterval"  
+  v-model:auto-play="preferences.autoPlay"  
+  :class="[styles.player.video]"  
+  :style="{  
+    aspectRatio,  
+  }"  
+  :sources="DataVideoSources.list"  
+  :subtitles="DataSubtitles.state"  
+  :last-time="DataHistory.lastTime.value"  
+  :subtitles-loading="DataSubtitles.isLoading"  
+  :subtitles-ready="DataSubtitles.isReady"  
+  :on-thumbnail-request="DataThumbnails.onThumbnailRequest"  
+  :on-subtitle-change="handleSubtitleChange"  
+  :on-timeupdate="handleTimeupdate"  
+  :on-seeking="DataHistory.handleSeek"  
+  :on-seeked="DataHistory.handleSeek"  
+  :on-canplay="handleStartAutoBuffer"  
+  @edit-filename="handleEditFilename"  
   @playlist-previous="handlePlaylistPrevious"  
-  @playlist-next="handlePlaylistNext"  
+  @playlist-next="handlePlaylistNext"   
             >
               <template #headerLeft>
                 <HeaderInfo
+    ref="headerInfoRef"  
                   :file-info="DataFileInfo"
                   :playlist="DataPlaylist"
                 />
@@ -272,6 +274,14 @@ async function handleSubtitleChange(subtitle: Subtitle | null) {
     params.pickCode.value ?? '',
     subtitle || null,
   )
+}
+
+/** HeaderInfo 组件引用 */  
+const headerInfoRef = ref<InstanceType<typeof HeaderInfo>>()  
+  
+/** 处理编辑文件名 */  
+function handleEditFilename() {  
+  headerInfoRef.value?.startEdit()  
 }
 
 /** 本地播放 */
