@@ -444,6 +444,29 @@ jumpToNextMarker: {
     }  
   },  
 },
+ /**  
+   * 按下 Shift + ← 播放列表上一个  
+   */  
+  playlistPrevious: {  
+    keys: ['Shift+ArrowLeft'],  
+    name: '播放列表上一个',  
+    keydown: (ctx) => {  
+      // 调用播放列表上一个方法  
+      ctx.rootEmit('playlist-previous')  
+    },  
+  },  
+  
+  /**  
+   * 按下 Shift + → 播放列表下一个  
+   */  
+  playlistNext: {  
+    keys: ['Shift+ArrowRight'],  
+    name: '播放列表下一个',  
+    keydown: (ctx) => {  
+      // 调用播放列表下一个方法  
+      ctx.rootEmit('playlist-next')  
+    },  
+  },
 }
 
 /**

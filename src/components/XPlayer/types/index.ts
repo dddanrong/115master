@@ -173,4 +173,6 @@ export interface XPlayerEmit {
   'update:disabledHDR': [boolean]
   /** 缩略图采样间隔 */
   'update:thumbnailsSamplingInterval': [number]
+    'playlist-previous': []  
+  'playlist-next': []  
 }

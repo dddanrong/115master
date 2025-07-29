@@ -45,7 +45,9 @@
               :on-timeupdate="handleTimeupdate"
               :on-seeking="DataHistory.handleSeek"
               :on-seeked="DataHistory.handleSeek"
-              :on-canplay="handleStartAutoBuffer"
+              :on-canplay="handleStartAutoBuffer"  
+  @playlist-previous="handlePlaylistPrevious"  
+  @playlist-next="handlePlaylistNext"  
             >
               <template #headerLeft>
                 <HeaderInfo
@@ -324,6 +326,27 @@ async function handleChangeVideo(item: Entity.PlaylistItem) {
   }
 }
 
+/** 播放列表上一个 */  
+function handlePlaylistPrevious() {  
+  if (!DataPlaylist.state?.data) return  
+    
+  const currentIndex = DataPlaylist.state.data.findIndex(item => item.pc === params.pickCode.value)  
+  if (currentIndex > 0) {  
+    const previousItem = DataPlaylist.state.data[currentIndex - 1]  
+    handleChangeVideo(previousItem)  
+  }  
+}  
+  
+/** 播放列表下一个 */  
+function handlePlaylistNext() {  
+  if (!DataPlaylist.state?.data) return  
+    
+  const currentIndex = DataPlaylist.state.data.findIndex(item => item.pc === params.pickCode.value)  
+  if (currentIndex >= 0 && currentIndex < DataPlaylist.state.data.length - 1) {  
+    const nextItem = DataPlaylist.state.data[currentIndex + 1]  
+    handleChangeVideo(nextItem)  
+  }  
+}
 /** 开始自动缓冲缩略图 */
 function handleStartAutoBuffer() {
   DataThumbnails.autoBuffer()
