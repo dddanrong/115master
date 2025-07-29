@@ -149,15 +149,10 @@ export class TopFilePathMod extends BaseMod {
   /**
    * 控制返回按钮显示/隐藏
    */
-  private controlBackButtonShow() {
-    const onlyOnePath = (this.readPathLinkNodes?.length ?? 0) <= 1
-    if (onlyOnePath || this.hasSearchBackButton) {
-      this.removeBackButton()
-    }
-    else if (!this.backButton) {
-      this.addBackButton()
-    }
-  }
+private controlBackButtonShow() {  
+  // 始终移除按钮，不再显示  
+  this.removeBackButton()  
+}
 
   /**
    * 监听路径变化

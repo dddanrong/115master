@@ -90,15 +90,22 @@ const autoResize = () => {
 }  
   
 // 修改 startEdit 函数  
-const startEdit = () => {  
-  if (!props.fileInfo.state?.file_id) return  
-  isEditing.value = true  
-  editingName.value = props.fileInfo.state?.file_name || ''  
-  nextTick(() => {  
-    nameInput.value?.focus()  
-    nameInput.value?.select()  
-    autoResize() // 初始化时调整高度  
-  })  
+const startEdit = () => {    
+  if (!props.fileInfo.state?.file_id) return    
+  isEditing.value = true    
+    
+  const fullFileName = props.fileInfo.state?.file_name || ''  
+  // 分离文件名和扩展名  
+  const lastDotIndex = fullFileName.lastIndexOf('.')  
+  const nameWithoutExtension = lastDotIndex > 0 ? fullFileName.substring(0, lastDotIndex) : fullFileName  
+    
+  editingName.value = nameWithoutExtension  
+    
+  nextTick(() => {    
+    nameInput.value?.focus()    
+    nameInput.value?.select()    
+    autoResize() // 初始化时调整高度    
+  })    
 }
 
 const props = defineProps<{  
@@ -120,17 +127,30 @@ const cancelEdit = () => {
 }  
   
 // 保存文件名  
-const handleSave = async () => {  
-  const trimmedName = editingName.value.trim()  
+const handleSave = async () => {    
+  const trimmedName = editingName.value.trim()    
     
-  if (!props.fileInfo.state?.file_id || !trimmedName || trimmedName === props.fileInfo.state?.file_name) {  
-    cancelEdit()  
-    return  
+  if (!props.fileInfo.state?.file_id || !trimmedName) {    
+    cancelEdit()    
+    return    
   }  
-  
-  try {  
-    const params = new URLSearchParams()  
-    params.append(`files_new_name[${props.fileInfo.state.file_id}]`, trimmedName)  
+    
+  // 获取原始扩展名  
+  const originalFileName = props.fileInfo.state?.file_name || ''  
+  const lastDotIndex = originalFileName.lastIndexOf('.')  
+  const extension = lastDotIndex > 0 ? originalFileName.substring(lastDotIndex) : ''  
+    
+  // 组合新的完整文件名  
+  const newFullFileName = trimmedName + extension  
+    
+  if (newFullFileName === originalFileName) {    
+    cancelEdit()    
+    return    
+  }  
+    
+  try {    
+    const params = new URLSearchParams()    
+    params.append(`files_new_name[${props.fileInfo.state.file_id}]`, newFullFileName)  
       
     const response = await fetch('https://webapi.115.com/files/batch_rename', {  
       method: 'POST',  
