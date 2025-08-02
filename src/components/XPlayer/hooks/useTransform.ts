@@ -26,7 +26,7 @@ function calculateScale(videoWidth: number, videoHeight: number, containerWidth:
 
   const scaleW = containerWidth / rotatedWidth
   const scaleH = containerHeight / rotatedHeight
-  return Math.min(scaleW, scaleH)
+  return ratio > 1 ? Math.min(scaleW, scaleH) : Math.max(scaleW, scaleH)
 }
 
 /** 画面转换 */
