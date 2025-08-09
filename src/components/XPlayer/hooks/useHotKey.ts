@@ -149,8 +149,6 @@ const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
       if (ctx.hud) {
         ctx.hud.showProgressJump(digit)
       }
-        ctx.controls.show()  
-  ctx.controls.startAutoHideTimer()  
     },
   },
 
@@ -221,9 +219,7 @@ editFileName: {
     allowRepeat: true,
   keydown: (ctx) => {  
     ctx.playerCore.value?.skip(30)  
-    ctx.hud?.showFastJumpHud(1)
-      ctx.controls.show()  
-  ctx.controls.startAutoHideTimer()    
+    ctx.hud?.showFastJumpHud(1)  
   },  
   },
   /**
@@ -234,9 +230,7 @@ fastForwardLong: {
   name: '快进120s',  
   keydown: (ctx) => {  
     ctx.playerCore.value?.skip(120)  
-    ctx.hud?.showFastJumpHud(1) 
-      ctx.controls.show()  
-  ctx.controls.startAutoHideTimer()   
+    ctx.hud?.showFastJumpHud(1)  
   },  
 },
   /**
@@ -442,8 +436,6 @@ jumpToPrevMarker: {
     if (prevMarker) {  
       ctx.playerCore.value?.seek(prevMarker.time)  
     }  
-      ctx.controls.show()  
-  ctx.controls.startAutoHideTimer()  
   },  
 },  
   
@@ -461,9 +453,7 @@ jumpToNextMarker: {
       
     if (nextMarker) {  
       ctx.playerCore.value?.seek(nextMarker.time)  
-    }
-      ctx.controls.show()  
-  ctx.controls.startAutoHideTimer()    
+    }  
   },  
 },
  /**  

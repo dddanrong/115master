@@ -184,8 +184,6 @@ watch(
     mainRef,
     disabledHideOnMouseLeave,
     disabledAutoHide,
-  show,  // 新增  
-  hide,  // 新增 
     setDisabledAutoHide,
     setDisabledHideOnMouseLeave,
     lockControlsWithTimeoutUnlock,
