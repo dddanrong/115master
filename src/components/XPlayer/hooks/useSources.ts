@@ -2,6 +2,7 @@ import type { VideoSource } from '../types'
 import type { PlayerContext } from './usePlayerProvide'
 import { useDebounceFn } from '@vueuse/core'
 import { ref, shallowRef, toValue, watch } from 'vue'
+import { qualityPreference } from '../../../utils/cache'
 import { VideoSourceExtension } from '../types'
 import { PlayerCoreType } from './playerCore/types'
 
@@ -99,6 +100,15 @@ export function useSources(ctx: PlayerContext) {
 
     // 恢复播放时间和状态
     playerCore.value.seek(currentTime)
+
+    /** 保存画质偏好（仅当不是FC2视频时） */
+    const isFC2 = document.title.includes('FC2')
+    if (!isFC2) {
+      await qualityPreference.savePreference(
+        source.quality,
+        source.displayQuality,
+      )
+    }
   }
 
   /** 中断源 */
@@ -158,28 +168,63 @@ export function useSources(ctx: PlayerContext) {
   /** 使用防抖的切换播放器核心方法 */
   const switchPlayerCore = useDebounceFn(switchPlayerCoreImpl, 300)
 
-watch(  
-  list,  
-  async () => {  
-    isInterrupt.value = false  
-    if (list.value.length === 0) {  
-      await ctx.playerCore.value?.destroy()  
-      return  
-    }  
-      
-    // 选择最低画质源而不是第一个源  
-    const lowestQualitySource = list.value.reduce((lowest, current) =>   
-      current.quality < lowest.quality ? current : lowest  
-    )  
-      
-    await initializeVideo(  
-      lowestQualitySource,  
-      undefined,  
-      toValue(ctx.rootProps.lastTime),  
-    )  
-  },  
-  { immediate: true, deep: true },  
-)
+  /** 选择合适的画质源 */
+  const selectAppropriateQuality = async (
+    sources: VideoSource[],
+  ): Promise<VideoSource> => {
+    if (sources.length === 0) {
+      throw new Error('没有可用的视频源')
+    }
+
+    /** 检查标题是否包含 FC2 */
+    const isFC2 = document.title.includes('FC2')
+
+    /** 如果是 FC2 视频，选择最低画质 */
+    if (isFC2) {
+      return sources.reduce((lowest, current) =>
+        current.quality < lowest.quality ? current : lowest,
+      )
+    }
+
+    /** 获取保存的画质偏好 */
+    const savedPreference = await qualityPreference.getPreference()
+
+    /** 如果有保存的画质偏好，尝试匹配 */
+    if (savedPreference) {
+      const matchedSource = sources.find(
+        source => source.quality === savedPreference.quality,
+      )
+      if (matchedSource) {
+        return matchedSource
+      }
+    }
+
+    /** 默认选择最高画质 */
+    return sources.reduce((highest, current) =>
+      current.quality > highest.quality ? current : highest,
+    )
+  }
+
+  watch(
+    list,
+    async () => {
+      isInterrupt.value = false
+      if (list.value.length === 0) {
+        await ctx.playerCore.value?.destroy()
+        return
+      }
+
+      /** 选择合适的画质源 */
+      const selectedSource = await selectAppropriateQuality(list.value)
+
+      await initializeVideo(
+        selectedSource,
+        undefined,
+        toValue(ctx.rootProps.lastTime),
+      )
+    },
+    { immediate: true, deep: true },
+  )
 
   return {
     list,
