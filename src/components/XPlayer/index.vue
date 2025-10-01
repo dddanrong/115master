@@ -47,7 +47,7 @@
           <slot name="controlsRight" />
         </ControlsRight>
       </ControlsMask>
-      <ControlsBar />
+      <ControlsBar @playlist-next="emit('playlistNext')" />
     </Controls>
 
     <!-- 状态HUD显示 -->

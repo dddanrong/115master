@@ -82,14 +82,15 @@
                   <Icon
                     class="swap-off" :class="[
                       styles.controls.btn.icon,
+                      styles.controls.markIcon.active,
                     ]"
-                    :icon="ICON_STAR_FILL"
+                    icon="material-symbols:delete-rounded"
                   />
                   <Icon
                     class="swap-on" :class="[
                       styles.controls.btn.icon,
                     ]"
-                    :icon="ICON_STAR"
+                    icon="material-symbols:delete-outline-rounded"
                   />
                 </button>
 
@@ -216,6 +217,9 @@ const styles = {
   controls: {
     btn: controlRightStyles.btn,
     iinaIcon: 'size-8 grayscale invert contrast-200',
+    markIcon: {
+      active: 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]',
+    },
   },
 }
 

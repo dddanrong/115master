@@ -34,6 +34,8 @@
           <div :class="styles.controlBar.left">
             <!-- 播放按钮 -->
             <PlayButton />
+            <!-- 下一集按钮 -->
+            <NextEpisodeButton @next="$emit('playlistNext')" />
             <!-- 音量控制 -->
             <VolumeControl />
             <!-- 时间显示 -->
@@ -71,6 +73,7 @@ import { useControlsMouseDetection } from '../../hooks/useControlsMouseDetection
 import { usePlayerContext } from '../../hooks/usePlayerProvide'
 import AudioTrackButton from './AudioTrackButton.vue'
 import FullscreenButton from './FullscreenButton.vue'
+import NextEpisodeButton from './NextEpisodeButton.vue'
 import PipButton from './PipButton.vue'
 import PlaybackRateButton from './PlaybackRateButton.vue'
 import PlayButton from './PlayButton.vue'
@@ -82,6 +85,11 @@ import SubtitleButton from './SubtitleButton.vue'
 import TimeDisplay from './TimeDisplay.vue'
 import VideoEnhanceSettings from './VideoEnhanceSettings.vue'
 import VolumeControl from './VolumeControl.vue'
+
+/** 事件 */
+defineEmits<{
+  playlistNext: []
+}>()
 
 /** 样式抽象 */
 const styles = {
