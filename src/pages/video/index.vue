@@ -58,6 +58,18 @@
                 />
               </template>
               <template #controlsRight>
+                <!-- FC2PPVDB 按钮 -->
+                <FC2PPVDBButton
+                  v-if="fc2Number"
+                  :fc2-number="fc2Number"
+                />
+
+                <!-- JavDB 按钮 -->
+                <JavDBButton
+                  v-if="javNumber"
+                  :movie-num="javNumber"
+                />
+
                 <!-- 播放列表切换按钮 -->
                 <label
                   for="playlist-drawer"
@@ -156,6 +168,8 @@ import { useTitle } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, shallowRef } from 'vue'
 import iinaIcon from '../../assets/icons/iina-icon.png'
 import XPlayer from '../../components/XPlayer/index.vue'
+import FC2PPVDBButton from '../../components/XPlayer/components/Controls/FC2PPVDBButton.vue'
+import JavDBButton from '../../components/XPlayer/components/Controls/JavDBButton.vue'
 import { controlRightStyles } from '../../components/XPlayer/styles/common'
 import { PLUS_VERSION } from '../../constants'
 import { useParamsVideoPage } from '../../hooks/useParams'
@@ -247,6 +261,20 @@ const DataHistory = useDataHistory()
 const DataMark = useMark(DataFileInfo)
 /** 是否正在切换视频 */
 const changeing = shallowRef(false)
+
+/** FC2 番号识别 */
+const fc2Number = computed(() => {
+  const title = DataFileInfo.state?.file_name || ''
+  const fc2Match = title.match(/FC2\D*(\d{6,7})/i)
+  return fc2Match ? fc2Match[1] : null
+})
+
+/** JAV 番号识别 */
+const javNumber = computed(() => {
+  const title = DataFileInfo.state?.file_name || ''
+  const javMatch = title.match(/([a-z]{2,5}(?:[-\s]|00)\d{3,5})/i)
+  return javMatch ? javMatch[0] : null
+})
 /** 视频尺寸 */
 const videoSize = computed(() => {
   return {

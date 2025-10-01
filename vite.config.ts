@@ -92,9 +92,12 @@ export default defineConfig({
           'javdb.com',
           'jdbstatic.com',
           'missav.ws',
+          'fc2ppvdb.com',
         ],
         'resource': {
           icon: 'https://115.com/favicon.ico',
+          fc2ppvdbIcon: 'https://www.google.com/s2/favicons?sz=64&domain=fc2ppvdb.com',
+          javdbIcon: 'https://javdb.com/favicon.ico',
         },
         'downloadURL':
           'https://github.com/cbingb666/115master/releases/latest/download/115master.user.js',
