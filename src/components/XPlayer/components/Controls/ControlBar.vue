@@ -8,12 +8,12 @@
     leave-to-class="opacity-0"
   >
     <div
-      v-if="show"
+      v-if="show || showProgressBarOnly"
       ref="controlBarRef"
       :class="styles.controlBar.main"
     >
       <!-- 背景渐变 -->
-      <div :class="[styles.controlBar.bg]" />
+      <div v-if="show" :class="[styles.controlBar.bg]" />
       <!-- 视频控制栏 -->
       <div
         :ref="controls.mainRef"
@@ -27,6 +27,7 @@
           }"
         />
         <div
+          v-if="show"
           :class="[styles.controlBar.bar, {
             [styles.controlBar.trivialize]: progressBar?.isLongPressDragging.value,
           }]"
@@ -108,7 +109,7 @@ const styles = {
 }
 
 /** 视频播放器上下文 */
-const { controls, playerCore, progressBar } = usePlayerContext()
+const { controls, playerCore, progressBar, playSettings } = usePlayerContext()
 
 /** 控制栏引用 */
 const controlBarRef = shallowRef<HTMLDivElement | null>(null)
@@ -118,6 +119,30 @@ useControlsMouseDetection(controlBarRef)
 /** 显示/隐藏控制栏 */
 const show = computed(() => {
   return controls.visible.value
+})
+
+/** 只显示进度条（当控制栏隐藏但满足条件时） */
+const showProgressBarOnly = computed(() => {
+  /** 如果控制栏已显示，不需要单独显示进度条 */
+  if (controls.visible.value) {
+    return false
+  }
+
+  /** 检查是否开启了"播放时不隐藏进度条"功能 */
+  if (!playSettings.keepProgressBarVisible.value) {
+    return false
+  }
+
+  /** 检查是否有时间标记 */
+  const hasTimeMarkers = (progressBar.timeMarkers?.value?.length ?? 0) > 0
+  if (!hasTimeMarkers) {
+    return false
+  }
+
+  /** 检查是否正在播放 */
+  const isPlaying = !playerCore.value?.paused
+
+  return isPlaying
 })
 
 /** 计算属性 */

@@ -23,6 +23,18 @@
             <Icon :icon="ICON_ERROR" />如何开启声音？
           </a>
         </fieldset>
+
+        <!-- 播放时不隐藏进度条 -->
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            进度条常驻
+          </legend>
+          <input
+            type="checkbox" :checked="playSettings.keepProgressBarVisible.value"
+            class="toggle toggle-sm toggle-primary"
+            @change="playSettings.toggleKeepProgressBarVisible"
+          >
+        </fieldset>
       </div>
     </div>
   </div>
