@@ -191,10 +191,19 @@ interface TimeMatch {
 
 /** 时间标记数据 */
 const timeMarkers = shallowRef<TimeMarker[]>([])
+/** 上次解析的标题 */
+const lastParsedTitle = shallowRef('')
 
 /** 解析标题中的时间点 */
 function parseTimeMarkers() {
   const title = document.title.replace(/\.(mp4|avi|mkv|mov|wmv|flv|webm|m4v|3gp|ts|m2ts)$/i, '')
+
+  /** 如果标题没有变化，不重复解析 */
+  if (title === lastParsedTitle.value) {
+    return
+  }
+
+  lastParsedTitle.value = title
   /** 新格式：(\d+h)?(\d+m)(\d)? 例如：5m, 0m1, 1h5m5 */
   const timeRegex = /(\d+h)?(\d+m)(\d)?/g
   const markers: TimeMarker[] = []
@@ -256,12 +265,25 @@ function calculatePosition(event: MouseEvent, element: HTMLElement) {
 watch(
   [() => player.value?.canplay, () => duration.value, () => controls.visible.value],
   ([canplay, dur, visible]) => {
-    if (canplay && dur > 0 && visible && timeMarkers.value.length === 0) {
+    if (canplay && dur > 0 && visible) {
       nextTick(() => parseTimeMarkers())
     }
   },
   { immediate: true },
 )
+
+/** 监听标题变化 */
+const titleObserver = new MutationObserver(() => {
+  if (player.value?.canplay && duration.value > 0 && controls.visible.value) {
+    nextTick(() => parseTimeMarkers())
+  }
+})
+
+titleObserver.observe(document.querySelector('title')!, {
+  subtree: true,
+  characterData: true,
+  childList: true,
+})
 
 /** BarWrapper 鼠标按下 */
 function handleBarWrapperMouseDown(event: MouseEvent) {
@@ -382,6 +404,7 @@ function handleThumbnailSeek(time: number) {
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleGlobalMouseMove)
   document.removeEventListener('mouseup', handleGlobalMouseUp)
+  titleObserver.disconnect()
 })
 
 // 暴露 timeMarkers 给上下文
