@@ -186,7 +186,8 @@ interface TimeMatch {
   index: number
   hours: number
   minutes: number
-  tensOfSeconds: number
+  seconds: number
+  suffix?: string
 }
 
 /** 时间标记数据 */
@@ -204,8 +205,8 @@ function parseTimeMarkers() {
   }
 
   lastParsedTitle.value = title
-  /** 新格式：(\d+h)?(\d+m)(\d)? 例如：5m, 0m1, 1h5m5 */
-  const timeRegex = /(\d+h)?(\d+m)(\d)?/g
+  const isFC2 = title.includes('FC2')
+  const timeRegex = /(\d+h)?(\d+m)(初|末)?(\d+s)?/g
   const markers: TimeMarker[] = []
   const matches: TimeMatch[] = []
   let match: RegExpExecArray | null = null
@@ -217,22 +218,46 @@ function parseTimeMarkers() {
       index: match.index,
       hours: match[1] ? parseInt(match[1]) : 0,
       minutes: match[2] ? parseInt(match[2]) : 0,
-      tensOfSeconds: match[3] ? parseInt(match[3]) : 0,
+      seconds: match[4] ? parseInt(match[4]) : 0,
+      suffix: match[3],
     })
   }
 
   matches.forEach((current, index) => {
     const nextMatch = matches[index + 1]
-    /** 计算总秒数：小时*3600 + 分钟*60 + (数字*10) */
-    const totalSeconds = current.hours * 3600 + current.minutes * 60 + current.tensOfSeconds * 10
+    let totalSeconds = current.hours * 3600 + current.minutes * 60 + current.seconds
 
-    if (totalSeconds > 0 && duration.value > 0) {
+    /** FC2特殊处理 */
+    if (isFC2) {
+      if (current.suffix === '初') {
+        totalSeconds = current.hours * 3600 + current.minutes * 60 + 0
+      }
+      else if (current.suffix === '末') {
+        totalSeconds = current.hours * 3600 + current.minutes * 60 + 40
+      }
+      else if (!current.suffix && !current.seconds) {
+        totalSeconds = current.hours * 3600 + current.minutes * 60 + 20
+      }
+    }
+
+    if (totalSeconds >= 0 && duration.value > 0) {
       const position = (totalSeconds / duration.value) * 100
       if (position <= 100) {
         /** 计算下一个时间点的完整秒数 */
         let nextTotalSeconds = duration.value
         if (nextMatch) {
-          nextTotalSeconds = nextMatch.hours * 3600 + nextMatch.minutes * 60 + nextMatch.tensOfSeconds * 10
+          nextTotalSeconds = nextMatch.hours * 3600 + nextMatch.minutes * 60 + nextMatch.seconds
+          if (isFC2) {
+            if (nextMatch.suffix === '初') {
+              nextTotalSeconds = nextMatch.hours * 3600 + nextMatch.minutes * 60 + 0
+            }
+            else if (nextMatch.suffix === '末') {
+              nextTotalSeconds = nextMatch.hours * 3600 + nextMatch.minutes * 60 + 40
+            }
+            else if (!nextMatch.suffix && !nextMatch.seconds) {
+              nextTotalSeconds = nextMatch.hours * 3600 + nextMatch.minutes * 60 + 20
+            }
+          }
         }
 
         const nextPosition = (nextTotalSeconds / duration.value) * 100
