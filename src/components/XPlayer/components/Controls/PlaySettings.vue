@@ -35,6 +35,18 @@
             @change="playSettings.toggleKeepProgressBarVisible"
           >
         </fieldset>
+
+        <!-- FC2低画质播放 -->
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            FC2低画质播放
+          </legend>
+          <input
+            type="checkbox" :checked="playSettings.fc2LowQualityPlay.value"
+            class="toggle toggle-sm toggle-primary"
+            @change="playSettings.toggleFc2LowQualityPlay"
+          >
+        </fieldset>
       </div>
     </div>
   </div>

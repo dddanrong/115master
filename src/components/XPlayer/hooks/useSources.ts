@@ -101,9 +101,9 @@ export function useSources(ctx: PlayerContext) {
     // 恢复播放时间和状态
     playerCore.value.seek(currentTime)
 
-    /** 保存画质偏好（仅当不是FC2视频时） */
+    /** 保存画质偏好（当不是FC2视频，或者FC2低画质播放关闭时） */
     const isFC2 = document.title.includes('FC2')
-    if (!isFC2) {
+    if (!isFC2 || !ctx.playSettings.fc2LowQualityPlay.value) {
       await qualityPreference.savePreference(
         source.quality,
         source.displayQuality,
@@ -179,15 +179,15 @@ export function useSources(ctx: PlayerContext) {
     /** 检查标题是否包含 FC2 */
     const isFC2 = document.title.includes('FC2')
 
-    /** 如果是 FC2 视频，选择最低画质 */
-    if (isFC2) {
+    /** 获取保存的画质偏好 */
+    const savedPreference = await qualityPreference.getPreference()
+
+    /** 如果开启了FC2低画质播放且是FC2视频，选择最低画质 */
+    if (isFC2 && ctx.playSettings.fc2LowQualityPlay.value) {
       return sources.reduce((lowest, current) =>
         current.quality < lowest.quality ? current : lowest,
       )
     }
-
-    /** 获取保存的画质偏好 */
-    const savedPreference = await qualityPreference.getPreference()
 
     /** 如果有保存的画质偏好，尝试匹配 */
     if (savedPreference) {
