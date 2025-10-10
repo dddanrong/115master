@@ -98,6 +98,9 @@ export class FileItemModExtMenu extends FileItemModBase {
 
   /** 加载 */
   onLoad() {
+    // 临时禁用扩展菜单显示，保留代码以备将来使用
+    return
+    
     // 如果文件列表类型为网格，则不加载扩展菜单
     if (this.itemInfo.fileListType === FileListType.grid) {
       return
