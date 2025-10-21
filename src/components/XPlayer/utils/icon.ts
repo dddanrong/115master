@@ -62,6 +62,8 @@ export const ICON_ABOUT = 'material-symbols:info-outline'
 export const ICON_COLOR_ADJUST = 'mdi:color'
 // 错误
 export const ICON_ERROR = 'material-symbols:error'
+// 画质
+export const ICON_QUALITY = 'material-symbols:high-quality-rounded'
 
 /**
  * 获取音量图标 Symbol

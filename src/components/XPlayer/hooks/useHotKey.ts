@@ -115,8 +115,12 @@ const KEYS = {
   'X': 'X',
   ',': ',',
   '.': '.',
-'e': 'e',  
+  'e': 'e',  
 'E': 'E',
+  'q': 'q',
+  'Q': 'Q',
+  'n': 'n',
+  'N': 'N',
 }
 
 const HOT_KEYS_CONFIG: Record<string, HotKeyConfig> = {
@@ -234,10 +238,10 @@ fastForwardLong: {
   },  
 },
   /**
-   * 按下 w 播放速度增大
+   * 按下 ↑ 播放速度增大
    */
   playbackRateUp: {
-    keys: [KEYS.w, KEYS.W],
+    keys: [KEYS.arrowUp],
     name: '播放速度增大',
     allowRepeat: true,
     keydown: async (ctx) => {
@@ -247,10 +251,10 @@ fastForwardLong: {
   },
 
   /**
-   * 按下 s 播放速度减小
+   * 按下 ↓ 播放速度减小
    */
   playbackRateDown: {
-    keys: [KEYS.s, KEYS.S],
+    keys: [KEYS.arrowDown],
     name: '播放速度减小',
     allowRepeat: true,
     keydown: (ctx, event) => {
@@ -266,10 +270,10 @@ fastForwardLong: {
   },
 
   /**
-   * 按下 = 音量增大
+   * 按下 w 音量增大
    */
   volumeUp: {
-    keys: [KEYS.arrowUp, KEYS['=']],
+    keys: [KEYS.w, KEYS.W, KEYS['=']],
     name: '音量增大',
     allowRepeat: true,
     keydown: (ctx) => {
@@ -279,10 +283,10 @@ fastForwardLong: {
   },
 
   /**
-   * 按下 - 音量减小
+   * 按下 s 音量减小
    */
   volumeDown: {
-    keys: [KEYS.arrowDown, KEYS['-']],
+    keys: [KEYS.s, KEYS.S, KEYS['-']],
     name: '音量减小',
     allowRepeat: true,
     keydown: (ctx) => {
@@ -457,10 +461,10 @@ jumpToNextMarker: {
   },  
 },
  /**  
-   * 按下 Shift + ← 播放列表上一个  
+   * 按下 B 播放列表上一个  
    */  
   playlistPrevious: {  
-    keys: ['Shift+ArrowLeft'],  
+    keys: [KEYS.b, KEYS.B],  
     name: '播放列表上一个',  
     keydown: (ctx) => {  
       // 调用播放列表上一个方法  
@@ -469,15 +473,46 @@ jumpToNextMarker: {
   },  
   
   /**  
-   * 按下 Shift + → 播放列表下一个  
+   * 按下 N 播放列表下一个  
    */  
   playlistNext: {  
-    keys: ['Shift+ArrowRight'],  
+    keys: [KEYS.n, KEYS.N],  
     name: '播放列表下一个',  
     keydown: (ctx) => {  
       // 调用播放列表下一个方法  
       ctx.rootEmit('playlist-next')  
     },  
+  },
+
+  /**
+   * 按下 Q 切换画质
+   */
+  switchQuality: {
+    keys: [KEYS.q, KEYS.Q],
+    name: '切换画质',
+    keydown: (ctx) => {
+      // 获取当前画质列表
+      const sources = ctx.source?.list.value || []
+      if (sources.length <= 1) return
+      
+      const currentSource = ctx.source?.current.value
+      if (!currentSource) return
+      
+      // 找到当前画质在列表中的索引
+      const currentIndex = sources.findIndex(source => 
+        source.quality === currentSource.quality && 
+        source.displayQuality === currentSource.displayQuality
+      )
+      
+      // 切换到下一个画质（循环）
+      const nextIndex = (currentIndex + 1) % sources.length
+      const nextSource = sources[nextIndex]
+      
+      if (nextSource) {
+        ctx.source?.changeQuality(nextSource)
+        ctx.hud?.showQualitySwitch(nextSource.displayQuality || nextSource.quality)
+      }
+    },
   },
 }
 

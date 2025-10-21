@@ -8,6 +8,7 @@ import {
   ICON_FLIP_X,
   ICON_FLIP_Y,
   ICON_LOCATION_ON,
+  ICON_QUALITY,
   ICON_ROCKET_LAUNCH,
   ICON_ROTATE,
   ICON_SUBTITLES,
@@ -165,6 +166,16 @@ export function useHud(ctx: PlayerContext) {
     })
   }
 
+  /** 显示画质切换 */
+  const showQualitySwitch = (quality: string | number) => {
+    const qualityText = typeof quality === 'number' ? `${quality}P` : quality
+    show({
+      title: '画质',
+      icon: ICON_QUALITY,
+      value: qualityText,
+    })
+  }
+
   // 监听字幕变化
   if (ctx.subtitles) {
     const { current } = ctx.subtitles
@@ -270,5 +281,6 @@ export function useHud(ctx: PlayerContext) {
     showVolume,
     showLongPressFastForward,
     showResumeSuspended,
+    showQualitySwitch,
   }
 }
